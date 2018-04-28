@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="icon" href="{% static '/img/timg.jpg' %}" type="img/x-ico" />
+        <title> 充值信仰!</title>
+        <link rel="stylesheet" href="{% static '/css/semantic.css' %}">
+        <script type="text/javascript" src="{% static '/js/jquery-3.2.1.min.js' %}"></script>
+        <script src="{% static '/js/semantic.js' %}"></script>
+        </head>
+        <body>
+            <div class="ui menu">
+                    <img src="{% static '/img/img.jpg' %}" height="40" width="180" id = "side" />
+              </div>
+            <div class="ui container" style="width:90%">
+                <table class="ui very basic table">
+                  <thead>
+                    <tr>
+                        <th>远程服务器</th>
+                        <th>选择需要安装的服务</th>
+                        <th>操作</th>
+                    </tr>
+                    <tr>
+                       <th style="height:60px">
+                           <div class="ui input" >
+                              <input type="text" placeholder="eg:127.0.0.1:22" id="ip_input">
+                            </div>
+                       </th>
+                       <th>
+                           <div class="ui checkbox">
+                                <input type="checkbox" name="checks" value="redis" >
+                                <label>Redis&nbsp;&nbsp;</label>
+                           </div>
+                           <div class="ui checkbox">
+                                 <input type="checkbox" name="checks" value="nginx">
+                                 <label>Nginx&nbsp;&nbsp;</label>
+                           </div>
+                           <div class="ui checkbox">
+                               <input type="checkbox" name="checks" value="mysql">
+                               <label>Mysql&nbsp;&nbsp;</label>
+                            </div>
+                            <div class="ui checkbox">
+                                <input type="checkbox" name="checks" value="node">
+                                <label>Node&nbsp;&nbsp;</label>
+                            </div>
+                           <div class="ui checkbox">
+                                <input type="checkbox" name="checks" value="java+daemonize">
+                                <label>Java+Daemonize&nbsp;&nbsp;</label>
+                           </div>
+                           <div class="ui checkbox">
+                                <input type="checkbox" name="checks" value="zabbix-agent">
+                                <label>Zabbix-Agent</label>
+                            </div>
+                       </th>
+                       <th>
+                           <button class="ui blue icon button" id="add_row">
+                                <i class="add icon"></i>
+                           </button>
+                       </th>
+                   </tr>
+
+                  </thead>
+                  <tbody id="show_data">
+                  </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="1">
+                                <div class="ui left action input">
+                                  <button class="ui orange button">
+                                    ssh_pass
+                                  </button>
+                                  <input type="text" id="ssh_pass" placeholder="servers password">
+                                </div>
+                            </th>
+                            <th colspan="1">
+                                <div class="ui left action input">
+                                  <button class="ui green button">
+                                    extra_vars
+                                  </button>
+                                  <input type="text" placeholder="only for zabbix agent. eg: remote_host,remote_activity" id="extra_vars"  style="width: 400px;">
+                                </div>
+                            </th>
+                            <th colspan="1">
+                                <div class="ui teal button" id="ser_submit">
+                                     索大好
+                                </div>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div id="get_result">
+
+                </div>
+            </div>
+        </body>
+        <script>
+            $("#add_row").click(function () {
+                var checkBoxValue = "";
+                var checks_values = $("input[name='checks']:checked");
+                var ip = $("#ip_input").val();
+                checks_values.each(function(){
+                    checkBoxValue += $(this).val()+";";
+                });
+                var new_row = "<tr height='60px'><th><p>"+ip+"</p></th><th>"+checkBoxValue+"</th><th>&nbsp;&nbsp;&nbsp;&nbsp;<button class='ui red icon button' ><i class='minus icon'></i></button></th></tr>";
+                $ ("#show_data").append (new_row);
+            });
+
+
+
+            $('body').on('click', '.red.icon', function(){
+                $(this).parent().parent().remove()
+            });
+
+
+            $("#ser_submit").click(function () {
+                var ips = Array();
+                var servers = Array();
+                var spilt_arry = Array();
+                var ssh_pass = $("#ssh_pass").val();
+                var extra_vars = $("#extra_vars").val();
+                $('#show_data').find('tr').each(function(){
+                    $(this).find('th').each(function(index,element){
+                        if(index==0){
+                                ips.push($(this).text());
+                        }else if(index==1){
+                                spilt_arry = $(this).text().split(";");
+                                spilt_arry.pop();
+                                servers.push(spilt_arry);
+                        }
+                    });
+                });
+                      $.post("post_result",{'ips':ips, 'servers':servers,'ssh_pass':ssh_pass,'extra_vars':extra_vars},function(data){
+                                data = JSON.parse(data);
+                                msg = data["msg"].split("\n");
+                                var result = "";
+                                for(var i=0;i<msg.length;i++){
+                                    result += "<p>"+ msg[i] +"</p>";
+                                }
+                                $("#get_result").append(result)
+                      });
+            });
+        </script>
+</html>
