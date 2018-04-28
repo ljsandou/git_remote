@@ -4,4 +4,5 @@
 
 页面显示如下
 
- ![image](https://github.com/ljsandou/sandou_web/display/display1.png)
+ ![image](https://github.com/ljsandou/sandou_web/tree/master/ansible_web/display/display1.png)
+ 
