@@ -1,0 +1,7 @@
+# sandou_web
+使用django搭建基于ansible批量部署的网站
+
+
+页面显示如下
+
+ ![image](https://github.com/ljsandou/sandou_web/display/display1.png)
